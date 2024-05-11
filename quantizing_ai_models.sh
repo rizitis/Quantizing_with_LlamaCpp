@@ -37,7 +37,7 @@
 # *************************************************************************#
 
 #---------------------------------------------------------------------------------------------------------------------#
-MODEL_URL=https://huggingface.co/refuelai/Llama-3-Refueled			#<---Replace or add your model repo URL
+MODEL_URL=https://huggingface.co/NousResearch/Hermes-2-Pro-Llama-3-8B			#<---Replace or add your model repo URL
 #---------------------------------------------------------------------------------------------------------------------#
 
 if [ "$(id -u)" -eq 0 ]; then
@@ -122,8 +122,8 @@ fi
 
 cd "$CWD"/models || exit 1
 
-git lfs install
-git clone "$MODEL_URL"
+#git lfs install
+#git clone "$MODEL_URL"
 
 # Lets use some of the hidden power bash scripting has ;)
 # Get all models directories
@@ -171,14 +171,32 @@ echo -e "${BLUE}Are you converting a Llama3 model? $TARGET_DIR (yes/no):${RESET}
 
 
 
-if [ yes == "$BPE_FILE_FOUND" ]; then
-  echo -e "${GREEN}Yupiii, Llama3 model found: $BPE_FILE_FOUND ${RESET}"
-cd "$CWD" || exit 1
-  python3 convert.py models/"$TARGET_DIR"/ --outtype f16 --vocab-type bpe
+if [ "$BPE_FILE_FOUND" == "yes" ]; then
+    echo -e "${GREEN}Yupiii, Llama3 model found: $BPE_FILE_FOUND ${RESET}"
+    cd "$CWD" || exit 1
+    if python3 convert.py  models/"$TARGET_DIR"/ --outtype f16 --vocab-type bpe; then
+        echo "Conversion successful using convert-hf-to-gguf.py"
+    else
+        echo "Conversion using convert-hf-to-gguf.py failed, trying alternative..."
+        if python3 convert-hf-to-gguf.py models/"$TARGET_DIR"/ --outtype f16; then
+            echo "Conversion successful using convert.py"
+        else
+            echo "Both conversion methods failed"
+        fi
+    fi
 else
-  echo -e "${GREEN}No BPE file found in $TARGET_DIR ${RESET}"
- cd "$CWD" || exit 1
-  python3 convert.py models/"$TARGET_DIR"/ --outtype f16 
+    echo -e "${GREEN}No BPE file found in $TARGET_DIR ${RESET}"
+    cd "$CWD" || exit 1
+    if python3 convert.py models/"$TARGET_DIR"/ --outtype f16; then
+        echo "Conversion successful using convert.py"
+    else
+        echo "Conversion using convert.py failed, trying alternative..."
+        if python3 convert-hf-to-gguf.py models/"$TARGET_DIR"/ --outtype f16; then
+            echo "Conversion successful using convert-hf-to-gguf.py"
+        else
+            echo "Both conversion methods failed"
+        fi
+    fi
 fi
 
 
