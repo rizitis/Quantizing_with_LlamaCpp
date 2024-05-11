@@ -175,11 +175,11 @@ if [ "$BPE_FILE_FOUND" == "yes" ]; then
     echo -e "${GREEN}Yupiii, Llama3 model found: $BPE_FILE_FOUND ${RESET}"
     cd "$CWD" || exit 1
     if python3 convert.py  models/"$TARGET_DIR"/ --outtype f16 --vocab-type bpe; then
-        echo "Conversion successful using convert-hf-to-gguf.py"
+        echo "Conversion successful using convert.py"
     else
-        echo "Conversion using convert-hf-to-gguf.py failed, trying alternative..."
+        echo "Conversion using convert.py failed, trying alternative..."
         if python3 convert-hf-to-gguf.py models/"$TARGET_DIR"/ --outtype f16; then
-            echo "Conversion successful using convert.py"
+            echo "Conversion successful using convert-hf-to-gguf.py"
         else
             echo "Both conversion methods failed"
         fi
