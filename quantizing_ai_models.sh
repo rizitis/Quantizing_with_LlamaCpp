@@ -122,8 +122,8 @@ fi
 
 cd "$CWD"/models || exit 1
 
-#git lfs install
-#git clone "$MODEL_URL"
+git lfs install
+git clone "$MODEL_URL"
 
 # Lets use some of the hidden power bash scripting has ;)
 # Get all models directories
