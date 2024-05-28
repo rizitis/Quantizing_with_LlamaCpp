@@ -49,3 +49,8 @@ MODEL_URL=https://huggingface.co/NousResearch/Hermes-2-Pro-Llama-3-8B			#<---Rep
 
 ### NOTE:
 **Warning: Running this script as root is not recommended.**
+
+## Supported models
+mistral
+llama
+llama3
