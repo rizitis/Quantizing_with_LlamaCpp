@@ -25,7 +25,7 @@ git lfs
      ********************************   
 ```
 
-Normally all other needs should be by default in your distro, if not..when script fail read what is missing and install from 
+Normally all other needs should be by default in your distro, if not..when script fail read what is missing and install from your distro package manager. 
 
 
 ## USAGE
