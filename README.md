@@ -2,21 +2,22 @@ Script is based on [GratisStudio](https://github.com/3Simplex/GratisStudio/blob/
 It is tested on Slackware64 current systems without issues. If you found a bug please open an issue. 
 
 ## Reqirements to run script:
-
+1.
 ```
 python3.11--> {numpy,sentencepiece,gguf}
 
 ```
+2.
 ```
 GPT4All(LLM environment):
 Slackers --> https://github.com/rizitis/GPT4All.SlackBuild
 Rest distro--> search for gpt4all at your distro package manager or use ubuntu installer  https://gpt4all.io/index.html 
 ```
-
+3.
 ```
 git lfs 
 ```
-
+4.
 ```
    ========= OPTIONAL:============= 
      Vulkan SDK (AMD GPU Support)  
@@ -28,9 +29,10 @@ Normally all other needs should be by default in your distro, if not
 
 
 ## USAGE
-
+1.
 When you find the LL model you want from [https://huggingface.co](https://huggingface.co)<br>
 Copy model url, then; <br>
+2.
 Open script with your favore text editor (emacs,vim,nano,gedit etc..)<br>
 Find this line and replace url with yours.
  ```
@@ -45,7 +47,7 @@ Next move is to make script executable if not...<br>
 
 Finaly run script `./quantizing_ai_models.sh`
 
-Just answer questions if needed and wait for
+Just answer questions if needed and wait for results... 
 
 ### NOTE:
 **Warning: Running this script as root is not recommended.**
