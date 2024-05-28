@@ -29,11 +29,9 @@ Normally all other needs should be by default in your distro, if not
 
 
 ## USAGE
-1.
-When you find the LL model you want from [https://huggingface.co](https://huggingface.co)<br>
+1. When you find the LL model you want from [https://huggingface.co](https://huggingface.co)<br>
 Copy model url, then; <br>
-2.
-Open script with your favore text editor (emacs,vim,nano,gedit etc..)<br>
+2. Open script with your favore text editor (emacs,vim,nano,gedit etc..)<br>
 Find this line and replace url with yours.
  ```
  #---------------------------------------------------------------------------------------------------------------------#
@@ -42,12 +40,12 @@ MODEL_URL=https://huggingface.co/NousResearch/Hermes-2-Pro-Llama-3-8B			#<---Rep
 
 ```
 
-Next move is to make script executable if not...<br>
+3. Next move is to make script executable if not...<br>
 `chmod +x quantizing_ai_models.sh`<br>
 
-Finaly run script `./quantizing_ai_models.sh`
+4. Finaly run script `./quantizing_ai_models.sh`
 
-Just answer questions if needed and wait for results... 
+5. Just answer questions if needed and wait for results... 
 
 ### NOTE:
 **Warning: Running this script as root is not recommended.**
