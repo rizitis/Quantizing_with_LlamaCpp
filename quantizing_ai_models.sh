@@ -37,7 +37,7 @@
 # *************************************************************************#
 
 #---------------------------------------------------------------------------------------------------------------------#
-MODEL_URL=https://huggingface.co/NousResearch/Hermes-2-Pro-Llama-3-8B			#<---Replace or add your model repo URL
+MODEL_URL=https://huggingface.co/ilsp/Meltemi-7B-Instruct-v1			#<---Replace or add your model repo URL
 #---------------------------------------------------------------------------------------------------------------------#
 
 if [ "$(id -u)" -eq 0 ]; then
@@ -122,8 +122,8 @@ fi
 
 cd "$CWD"/models || exit 1
 
-git lfs install
-git clone "$MODEL_URL"
+#git lfs install
+#git clone "$MODEL_URL"
 
 # Lets use some of the hidden power bash scripting has ;)
 # Get all models directories
@@ -165,6 +165,11 @@ else
   exit 69
 fi
  
+ echo -e "${BLUE}Are you converting a Llama model or mistral? $TARGET_DIR (llama/mistral):${RESET}"
+  read BPE_LLAMA_MISTRAL
+  
+ if [ "$BPE_LLAMA_MISTRAL" == "llama" ]; then
+  
 # Some day I will be a h4ker, for now thats all...
 echo -e "${BLUE}Are you converting a Llama3 model? $TARGET_DIR (yes/no):${RESET}"
  read BPE_FILE_FOUND
@@ -239,6 +244,54 @@ else
   fi
 fi
 
+else
+[ "$BPE_LLAMA_MISTRAL" == "mistral" ]
+echo "MISTRAL..."
+sleep 2
+cd "$CWD" || exit 1
+# Convert to fp16
+#fp16=".fp16.bin"
+python3 convert.py models/"$TARGET_DIR"/ --pad-vocab --outtype f16 
+
+
+mv "$CWD"/models/"$TARGET_DIR"/*.gguf  "$CWD"/build/bin/ggml-model-f16.gguf || exit 12
+
+# Quantize the model for each method in the QUANTIZATION_METHODS list
+cd "$CWD/build/bin/"  || exit 1
+
+method="q4_k_m"
+chmod +x quantize || exit 3
+./quantize ggml-model-f16.gguf ggml-model-Q4_0.gguf $method
+
+
+GGUF_FILES=$(ls "ggml-model-Q4_0.gguf" 2>/dev/null)
+echo "$GGUF_FILES"
+
+# Count 
+FILE_COUNT=$(echo "$GGUF_FILES" | wc -l)
+
+
+if [ $FILE_COUNT -eq 0 ]; then
+  echo -e "${RED}Error: File '.gguf' not found.${RESET}"
+  exit 3
+elif [ $FILE_COUNT -gt 1 ]; then
+  echo -e "${RED}Error: Multiple files found with the name 'ggml-model-Q4_0.gguf'. Cannot proceed.${RESET}"
+  echo "$GGUF_FILES"
+  exit 3
+else
+  mv "$GGUF_FILES" "${TARGET_DIR}-Q4_0.gguf"
+
+  # Check if the rename (mv) command was successful
+  if [ $? -eq 0 ]; then
+    echo -e "${GREEN}File renamed to ${TARGET_DIR}-Q4_0.gguf ${RESET}"
+  else
+    echo -e "${RED}Error: Failed to rename file.${RESET}"
+    exit 3
+  fi
+fi
+
+
+fi
 echo -e "${GREEN}SUCCESS...${RESET}"
 echo ""
 echo ""
