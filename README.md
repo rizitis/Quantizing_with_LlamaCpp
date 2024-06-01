@@ -47,7 +47,9 @@ MODEL_URL=https://huggingface.co/NousResearch/Hermes-2-Pro-Llama-3-8B			#<---Rep
 
 4. Finaly run script `./quantizing_ai_models.sh`
 
-5. Just answer questions if needed and wait for results... 
+5. Just answer questions if needed and wait for results...
+
+6. If you have success 👊 you can now load your model.gguf using gpt4all app.
 
 ### NOTE:
 **Warning: Running this script as root is not recommended.**
