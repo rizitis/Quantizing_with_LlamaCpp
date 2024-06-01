@@ -251,8 +251,9 @@ sleep 2
 cd "$CWD" || exit 1
 # Convert to fp16
 #fp16=".fp16.bin"
-python3 convert.py models/"$TARGET_DIR"/ --pad-vocab --outtype f16 
-
+# convert.py is removed ... so we use examples/convert-legacy-llama.py
+#python3 convert.py models/"$TARGET_DIR"/ --pad-vocab --outtype f16 
+python3 examples/convert-legacy-llama.py models/"$TARGET_DIR"/ --pad-vocab --outtype f16
 
 mv "$CWD"/models/"$TARGET_DIR"/*.gguf  "$CWD"/build/bin/ggml-model-f16.gguf || exit 12
 
