@@ -1,3 +1,5 @@
+update 1/6/24 after recent updates of llama.cpp script need some edits. will do what needed soon
+
 Script is based on [GratisStudio](https://github.com/3Simplex/GratisStudio/blob/main/LlamaCpp/Quantizing_with_LlamaCpp.md) HowTo for windows.   
 It is tested on Slackware64 current systems without issues. If you found a bug please open an issue. 
 
