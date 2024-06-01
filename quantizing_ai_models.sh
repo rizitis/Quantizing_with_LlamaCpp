@@ -23,21 +23,21 @@
 #  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# *************************************************************************#
-# ========== Needed:==============                                         #
-## python3.11 --> {numpy,sentencepiece,gguf}                               #
-## GPT4All(LLM environment)-> https://github.com/rizitis/GPT4All.SlackBuild#
-## https://gpt4all.io/index.html <--                                       #
-## git lfs                                                                 #
-# =========================================================================#
-#                                                                          #
-# ========= OPTIONAL:=============                                         #
-## Vulkan SDK (AMD GPU Support)                                            #
-## Cuda toolkit (Nvidia GPU Support)                                       #
-# *************************************************************************#
+# ****************************************************************************#
+# ========== Needed:==============                                            #
+## 1. python3.11 --> {numpy,sentencepiece,gguf}                               #
+## 2. GPT4All(LLM environment)-> https://github.com/rizitis/GPT4All.SlackBuild#
+## https://gpt4all.io/index.html OR from your package manager                 #
+## 3. git lfs                                                                 #
+# ============================================================================#
+#                                                                             #
+# ========= OPTIONAL:=============                                            #
+## Vulkan SDK (AMD GPU Support)                                               #
+## Cuda toolkit (Nvidia GPU Support)                                          #
+# ****************************************************************************#
 
 #---------------------------------------------------------------------------------------------------------------------#
-MODEL_URL=https://huggingface.co/ilsp/Meltemi-7B-Instruct-v1			#<---Replace or add your model repo URL
+MODEL_URL="$1"			#<---Replace or add your model repo URL. Else execute script like this: ./quantizing_ai_models.sh <https://huggingface.co/.... >
 #---------------------------------------------------------------------------------------------------------------------#
 
 if [ "$(id -u)" -eq 0 ]; then
@@ -122,9 +122,10 @@ fi
 
 cd "$CWD"/models || exit 1
 
-#git lfs install
-#git clone "$MODEL_URL"
-
+git lfs install
+set +e
+git clone "$MODEL_URL"
+set -e # we dont need what is disabled for security reasons but we also dont like script to stop :)
 # Lets use some of the hidden power bash scripting has ;)
 # Get all models directories
 MATCHING_DIRS=$(find . -maxdepth 1 -type d)
@@ -165,7 +166,7 @@ else
   exit 69
 fi
  
- echo -e "${BLUE}Are you converting a Llama model or mistral? $TARGET_DIR (llama/mistral):${RESET}"
+ echo -e "${BLUE}Are you converting a llama model or mistral? $TARGET_DIR (llama/mistral):${RESET}"
   read BPE_LLAMA_MISTRAL
   
  if [ "$BPE_LLAMA_MISTRAL" == "llama" ]; then
@@ -175,7 +176,9 @@ echo -e "${BLUE}Are you converting a Llama3 model? $TARGET_DIR (yes/no):${RESET}
  read BPE_FILE_FOUND
 
 
-
+# After last changes in lamma.cpp I will keep this here for a wile just for people that dont update their lamma.cpp (91,92)
+# If you dont have a very importand reason then suggested to follow llamm.cpp updates...
+# I will keep convert.py here but not for ever special if script some day break I will absolutly remove it. 
 if [ "$BPE_FILE_FOUND" == "yes" ]; then
     echo -e "${GREEN}Yupiii, Llama3 model found: $BPE_FILE_FOUND ${RESET}"
     cd "$CWD" || exit 1
@@ -183,7 +186,7 @@ if [ "$BPE_FILE_FOUND" == "yes" ]; then
         echo -e "${GREEN}Conversion successful using convert.py${RESET}"
     else
         echo -e "${RED}Conversion using convert.py failed, trying alternative...${RESET}"
-        if python3 convert-hf-to-gguf.py models/"$TARGET_DIR"/ --outtype f16; then
+        if python3 convert-hf-to-gguf.py --outtype f16 models/"$TARGET_DIR"/; then
             echo -e "${GREEN}Conversion successful using convert-hf-to-gguf.py${RESET}"
         else
             echo -e "${RED}Both conversion methods failed${RESET}"
@@ -197,7 +200,7 @@ else
         echo -e "${GREEN}Conversion successful using convert.py${RESET}"
     else
         echo -e "${RED}Conversion using convert.py failed, trying alternative...${RESET}"
-        if python3 convert-hf-to-gguf.py models/"$TARGET_DIR"/ --outtype f16; then
+        if python3 convert-hf-to-gguf.py --outtype f16 models/"$TARGET_DIR"/; then
             echo -e "${GREEN}Conversion successful using convert-hf-to-gguf.py${RESET}"
         else
             echo -e "${RED}Both conversion methods failed${RESET}"
@@ -250,10 +253,12 @@ echo "MISTRAL..."
 sleep 2
 cd "$CWD" || exit 1
 # Convert to fp16
-#fp16=".fp16.bin"
 # convert.py is removed ... so we use examples/convert-legacy-llama.py
+# If you havent update you llama.cpp and script fail uncomment next line and comment the next one:
+
 #python3 convert.py models/"$TARGET_DIR"/ --pad-vocab --outtype f16 
 python3 examples/convert-legacy-llama.py models/"$TARGET_DIR"/ --pad-vocab --outtype f16
+
 
 mv "$CWD"/models/"$TARGET_DIR"/*.gguf  "$CWD"/build/bin/ggml-model-f16.gguf || exit 12
 
@@ -285,8 +290,9 @@ else
   # Check if the rename (mv) command was successful
   if [ $? -eq 0 ]; then
     echo -e "${GREEN}File renamed to ${TARGET_DIR}-Q4_0.gguf ${RESET}"
+    echo -e "${GREEN}Model moved to llama.cpp/build/bin/${RESET}"
   else
-    echo -e "${RED}Error: Failed to rename file.${RESET}"
+    echo -e "${RED}Error: Failed to rename or model is not moved to llama.cpp/build/bin/${RESET}"
     exit 3
   fi
 fi
@@ -296,6 +302,7 @@ fi
 echo -e "${GREEN}SUCCESS...${RESET}"
 echo ""
 echo ""
+echo "You can now load llama.cpp/build/bin/${TARGET_DIR}-Q4_0.gguf using:"
 cat << "EOF"
 .----------------.  .----------------.  .----------------.  .----------------.  .----------------.  .----------------.  .----------------.
 | .--------------. || .--------------. || .--------------. || .--------------. || .--------------. || .--------------. || .--------------. |

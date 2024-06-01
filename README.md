@@ -1,5 +1,3 @@
-update 1/6/24 after recent updates of llama.cpp script need some edits. will do what needed soon
-
 Script is based on [GratisStudio](https://github.com/3Simplex/GratisStudio/blob/main/LlamaCpp/Quantizing_with_LlamaCpp.md) HowTo for windows.   
 It is tested on Slackware64 current systems without issues. If you found a bug please open an issue. 
 
@@ -31,23 +29,22 @@ Normally all other needs should be by default in your distro, if not..when scrip
 
 
 ## USAGE
-1. When you find the LL model you want from [https://huggingface.co](https://huggingface.co)<br>
-Copy model url, then; <br>
-2. Open script with your favore text editor (emacs,vim,nano,gedit etc..)<br>
-Find this line and replace url with yours.
- ```
- #---------------------------------------------------------------------------------------------------------------------#
-MODEL_URL=https://huggingface.co/NousResearch/Hermes-2-Pro-Llama-3-8B			#<---Replace or add your model repo URL
-#---------------------------------------------------------------------------------------------------------------------#
-
+1. Make script executable if not...<br>
+```
+chmod +x quantizing_ai_models.sh
+```
+2.  Find the LL model you want from [https://huggingface.co](https://huggingface.co)<br>
+Copy ONLY the provided url for git clone, example: <br>
+![copy url](./model-url.png)
+3. Now exexute script in terminal following by model url example:
+```
+./quantizing_ai_models.sh https://huggingface.co/Cadenza-Labs/dolphin-llama3-8B-sleeper-agent-standard-l
 ```
 
-3. Next move is to make script executable if not...<br>
-`chmod +x quantizing_ai_models.sh`<br>
 
-4. Finaly run script `./quantizing_ai_models.sh`
 
-5. Just answer questions if needed and wait for results...
+
+5. Just answer questions when needed and wait for results...
 
 6. If you have success 👊 you can now load your model.gguf using gpt4all app.
 
