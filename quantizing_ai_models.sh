@@ -148,7 +148,7 @@ if [ -n "$MATCHING_DIRS" ]; then
     read -p "Choose a directory by number (0-$((${#MATCHING_ARRAY[@]} - 1))): " USER_CHOICE
     
     # Validate choice
-    if [[ $USER_CHOICE =~ ^[0-9]+$ ]] && [ $USER_CHOICE -ge 0 ] && [ $USER_CHOICE -lt ${#MATCHING_ARRAY[@]} ]; then
+    if [[ $USER_CHOICE =~ ^[0-9]+$ ]] && [ "$USER_CHOICE" -ge 0 ] && [ "$USER_CHOICE" -lt ${#MATCHING_ARRAY[@]} ]; then
       TARGET_DIR=${MATCHING_ARRAY[$USER_CHOICE]}
       cd "$TARGET_DIR" || exit 1      
     else
@@ -166,8 +166,49 @@ else
   exit 69
 fi
  
- echo -e "${BLUE}Are you converting a llama model or mistral? $TARGET_DIR (llama/mistral):${RESET}"
+ echo -e "${BLUE}Are you converting a llama model, ggml or mistral? $TARGET_DIR (llama/mistral/ggml):${RESET}"
   read BPE_LLAMA_MISTRAL
+  
+  if [ "$BPE_LLAMA_MISTRAL" == "ggml" ]; then
+  python3 convert-llama-ggml-to-gguf.py models/"$TARGET_DIR"/ --outtype f16
+ mv "$CWD"/models/"$TARGET_DIR"/ggml-model-f16.gguf  "$CWD"/build/bin/ 
+
+if [ $? -ne 0 ]; then
+  echo -e "${RED}Error: Failed to move ggml-model-f16.gguf to $CWD/bin/ ${RESET}"
+  exit 2
+else
+  echo -e "${GREEN}File moved successfully $CWD/bin/ keep going...${RESET}"
+fi
+
+cd "$CWD/build/bin/"  || exit 1
+chmod +x llama-quantize || exit 3
+./llama-quantize ggml-model-f16.gguf ggml-model-Q4_0.gguf Q4_0
+
+GGUF_FILES=$(ls "ggml-model-Q4_0.gguf" 2>/dev/null)
+
+# Count 
+FILE_COUNT=$(echo "$GGUF_FILES" | wc -l)
+
+if [ "$FILE_COUNT" -eq 0 ]; then
+  echo -e "${RED}Error: File 'ggml-model-Q4_0.gguf' not found.${RESET}"
+  exit 3
+elif [ "$FILE_COUNT" -gt 1 ]; then
+  echo -e "${RED}Error: Multiple files found with the name 'ggml-model-Q4_0.gguf'. Cannot proceed.${RESET}"
+  echo "$GGUF_FILES"
+  exit 3
+else
+  mv "ggml-model-Q4_0.gguf" "${TARGET_DIR}-Q4_0.gguf"
+fi
+  # Check if the rename (mv) command was successful
+  if [ $? -eq 0 ]; then
+    echo -e "${GREEN}File renamed to ${TARGET_DIR}-Q4_0.gguf ${RESET}"
+  else
+    echo -e "${RED}Error: Failed to rename file.${RESET}"
+    exit 3
+  fi
+else
+  echo ""
+fi     
   
  if [ "$BPE_LLAMA_MISTRAL" == "llama" ]; then
   
@@ -182,25 +223,25 @@ echo -e "${BLUE}Are you converting a Llama3 model? $TARGET_DIR (yes/no):${RESET}
 if [ "$BPE_FILE_FOUND" == "yes" ]; then
     echo -e "${GREEN}Yupiii, Llama3 model found: $BPE_FILE_FOUND ${RESET}"
     cd "$CWD" || exit 1
-    if python3 convert.py  models/"$TARGET_DIR"/ --outtype f16 --vocab-type bpe; then
-        echo -e "${GREEN}Conversion successful using convert.py${RESET}"
+    if python3 convert-hf-to-gguf.py  models/"$TARGET_DIR"/ --outtype f16 --vocab-type bpe; then
+        echo -e "${GREEN}Conversion successful using --vocab-type bpe${RESET}"
     else
-        echo -e "${RED}Conversion using convert.py failed, trying alternative...${RESET}"
+        echo -e "${RED}Conversion using --vocab-type bpe failed, trying alternative...${RESET}"
         if python3 convert-hf-to-gguf.py --outtype f16 models/"$TARGET_DIR"/; then
-            echo -e "${GREEN}Conversion successful using convert-hf-to-gguf.py${RESET}"
+            echo -e "${GREEN}Conversion successful using convert-hf-to-gguf.py --outtype f16${RESET}"
         else
             echo -e "${RED}Both conversion methods failed${RESET}"
             exit 66
         fi
     fi
 else
-    echo -e "${GREEN}No BPE file found in $TARGET_DIR ${RESET}"
+    echo -e "${GREEN}No llama3 $TARGET_DIR ${RESET}"
     cd "$CWD" || exit 1
-    if python3 convert.py models/"$TARGET_DIR"/ --outtype f16; then
+    if python3 examples/convert-legacy-llama.py models/"$TARGET_DIR"/ --outtype f16 --vocab-type bpe; then
         echo -e "${GREEN}Conversion successful using convert.py${RESET}"
     else
-        echo -e "${RED}Conversion using convert.py failed, trying alternative...${RESET}"
-        if python3 convert-hf-to-gguf.py --outtype f16 models/"$TARGET_DIR"/; then
+        echo -e "${RED}Conversion using --vocab-type bpe failed, trying alternative...${RESET}"
+        if python3 examples/convert-legacy-llama.py models/"$TARGET_DIR"/ --outtype f16; then
             echo -e "${GREEN}Conversion successful using convert-hf-to-gguf.py${RESET}"
         else
             echo -e "${RED}Both conversion methods failed${RESET}"
@@ -220,18 +261,18 @@ else
 fi
 
 cd "$CWD/build/bin/"  || exit 1
-chmod +x quantize || exit 3
-./quantize ggml-model-f16.gguf ggml-model-Q4_0.gguf Q4_0
+chmod +x llama-quantize || exit 3
+./llama-quantize ggml-model-f16.gguf ggml-model-Q4_0.gguf Q4_0
 
 GGUF_FILES=$(ls "ggml-model-Q4_0.gguf" 2>/dev/null)
 
 # Count 
 FILE_COUNT=$(echo "$GGUF_FILES" | wc -l)
 
-if [ $FILE_COUNT -eq 0 ]; then
+if [ "$FILE_COUNT" -eq 0 ]; then
   echo -e "${RED}Error: File 'ggml-model-Q4_0.gguf' not found.${RESET}"
   exit 3
-elif [ $FILE_COUNT -gt 1 ]; then
+elif [ "$FILE_COUNT" -gt 1 ]; then
   echo -e "${RED}Error: Multiple files found with the name 'ggml-model-Q4_0.gguf'. Cannot proceed.${RESET}"
   echo "$GGUF_FILES"
   exit 3
@@ -262,12 +303,12 @@ python3 examples/convert-legacy-llama.py models/"$TARGET_DIR"/ --pad-vocab --out
 
 mv "$CWD"/models/"$TARGET_DIR"/*.gguf  "$CWD"/build/bin/ggml-model-f16.gguf || exit 12
 
-# Quantize the model for each method in the QUANTIZATION_METHODS list
+# llama-quantize the model for each method in the QUANTIZATION_METHODS list
 cd "$CWD/build/bin/"  || exit 1
 
 method="q4_k_m"
-chmod +x quantize || exit 3
-./quantize ggml-model-f16.gguf ggml-model-Q4_0.gguf $method
+chmod +x llama-quantize || exit 3
+./llama-quantize ggml-model-f16.gguf ggml-model-Q4_0.gguf $method
 
 
 GGUF_FILES=$(ls "ggml-model-Q4_0.gguf" 2>/dev/null)
@@ -277,10 +318,10 @@ echo "$GGUF_FILES"
 FILE_COUNT=$(echo "$GGUF_FILES" | wc -l)
 
 
-if [ $FILE_COUNT -eq 0 ]; then
+if [ "$FILE_COUNT" -eq 0 ]; then
   echo -e "${RED}Error: File '.gguf' not found.${RESET}"
   exit 3
-elif [ $FILE_COUNT -gt 1 ]; then
+elif [ "$FILE_COUNT" -gt 1 ]; then
   echo -e "${RED}Error: Multiple files found with the name 'ggml-model-Q4_0.gguf'. Cannot proceed.${RESET}"
   echo "$GGUF_FILES"
   exit 3
