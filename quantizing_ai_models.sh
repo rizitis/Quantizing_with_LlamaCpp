@@ -170,7 +170,7 @@ fi
   read BPE_LLAMA_MISTRAL
   
   if [ "$BPE_LLAMA_MISTRAL" == "ggml" ]; then
-  python3 convert-llama-ggml-to-gguf.py models/"$TARGET_DIR"/ --outtype f16
+  python3 convert_llama_ggml_to_gguf.py models/"$TARGET_DIR"/ --outtype f16
  mv "$CWD"/models/"$TARGET_DIR"/ggml-model-f16.gguf  "$CWD"/build/bin/ 
 
 if [ $? -ne 0 ]; then
@@ -223,11 +223,11 @@ echo -e "${BLUE}Are you converting a Llama3 model? $TARGET_DIR (yes/no):${RESET}
 if [ "$BPE_FILE_FOUND" == "yes" ]; then
     echo -e "${GREEN}Yupiii, Llama3 model found: $BPE_FILE_FOUND ${RESET}"
     cd "$CWD" || exit 1
-    if python3 convert-hf-to-gguf.py  models/"$TARGET_DIR"/ --outtype f16 --vocab-type bpe; then
+    if python3 convert_hf_to_gguf.py  models/"$TARGET_DIR"/ --outtype f16 --vocab-type bpe; then
         echo -e "${GREEN}Conversion successful using --vocab-type bpe${RESET}"
     else
         echo -e "${RED}Conversion using --vocab-type bpe failed, trying alternative...${RESET}"
-        if python3 convert-hf-to-gguf.py --outtype f16 models/"$TARGET_DIR"/; then
+        if python3 convert_hf_to_gguf.py --outtype f16 models/"$TARGET_DIR"/; then
             echo -e "${GREEN}Conversion successful using convert-hf-to-gguf.py --outtype f16${RESET}"
         else
             echo -e "${RED}Both conversion methods failed${RESET}"
@@ -237,11 +237,11 @@ if [ "$BPE_FILE_FOUND" == "yes" ]; then
 else
     echo -e "${GREEN}No llama3 $TARGET_DIR ${RESET}"
     cd "$CWD" || exit 1
-    if python3 examples/convert-legacy-llama.py models/"$TARGET_DIR"/ --outtype f16 --vocab-type bpe; then
+    if python3 examples/convert_legacy_llama.py models/"$TARGET_DIR"/ --outtype f16 --vocab-type bpe; then
         echo -e "${GREEN}Conversion successful using convert.py${RESET}"
     else
         echo -e "${RED}Conversion using --vocab-type bpe failed, trying alternative...${RESET}"
-        if python3 examples/convert-legacy-llama.py models/"$TARGET_DIR"/ --outtype f16; then
+        if python3 examples/convert_legacy_llama.py models/"$TARGET_DIR"/ --outtype f16; then
             echo -e "${GREEN}Conversion successful using convert-hf-to-gguf.py${RESET}"
         else
             echo -e "${RED}Both conversion methods failed${RESET}"
@@ -298,7 +298,7 @@ cd "$CWD" || exit 1
 # If you havent update you llama.cpp and script fail uncomment next line and comment the next one:
 
 #python3 convert.py models/"$TARGET_DIR"/ --pad-vocab --outtype f16 
-python3 examples/convert-legacy-llama.py models/"$TARGET_DIR"/ --pad-vocab --outtype f16
+python3 examples/convert_legacy_llama.py models/"$TARGET_DIR"/ --pad-vocab --outtype f16
 
 
 mv "$CWD"/models/"$TARGET_DIR"/*.gguf  "$CWD"/build/bin/ggml-model-f16.gguf || exit 12
