@@ -84,6 +84,8 @@ EOF
 
 sleep 3
 
+JOBS=-j$(getconf _NPROCESSORS_ONLN)
+
 set -e
 
 if [ -d "llama.cpp" ]; then
@@ -106,13 +108,13 @@ if [ -d "llama.cpp" ]; then
   echo -e "${GREEN}Building with GPU support...${RESET}"  
   # CMake commands for building with GPU support
   cmake .. -DLLAMA_VULKAN=ON -DLLAMA_NATIVE=ON
-  cmake --build . --config Release
+  cmake --build . --config Release "$JOBS"
   
  elif [[ "$BUILD_WITH_GPU" == "no" ]]; then
   echo -e "${GREEN}Building without GPU support...${RESET}"  
   # CMake commands for building without GPU support (CPU only)
   cmake .. -DLLAMA_NATIVE=ON
-  cmake --build . --config Release
+  cmake --build . --config Release "$JOBS"
   
  else
   echo -e "${RED}Invalid input. Please enter 'yes' or 'no'.${RESET}"
