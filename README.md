@@ -9,9 +9,7 @@ python3.11--> {numpy,sentencepiece,gguf}
 ```
 2.
 ```
-GPT4All(LLM environment):
-Slackers --> https://github.com/rizitis/GPT4All.SlackBuild
-Rest distro--> search for gpt4all at your distro package manager or use ubuntu installer  https://gpt4all.io/index.html 
+GPT4All or OLLAMA 
 ```
 3.
 ```
