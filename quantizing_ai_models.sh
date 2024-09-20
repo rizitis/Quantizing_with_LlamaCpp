@@ -2,7 +2,8 @@
 
 
 # 05/2024 rizitis Copyrights none.
-# Script for Quantizing_with_LlamaCpp AI models for Slackware64-current systems.
+# update 20/09/2024
+# Script for Quantizing_with_LlamaCpp AI models, tested for Slackware64-current systems.
 # Based on https://github.com/3Simplex/GratisStudio/blob/main/LlamaCpp/Quantizing_with_LlamaCpp.md HOWTO.
 
 # Redistribution and use of this script, with or without modification, is
@@ -26,8 +27,7 @@
 # ****************************************************************************#
 # ========== Needed:==============                                            #
 ## 1. python3.11 --> {numpy,sentencepiece,gguf}                               #
-## 2. GPT4All(LLM environment)-> https://github.com/rizitis/GPT4All.SlackBuild#
-## https://gpt4all.io/index.html OR from your package manager                 #
+## 2. GPT4All(LLM environment) or OLLAMA                 #
 ## 3. git lfs                                                                 #
 # ============================================================================#
 #                                                                             #
