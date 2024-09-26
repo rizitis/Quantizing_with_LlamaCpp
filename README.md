@@ -44,7 +44,7 @@ Copy ONLY the provided url for git clone, example: <br>
 
 5. Just answer questions when needed and wait for results...
 
-6. If you have success 👊 you can now load your model.gguf using gpt4all app.
+6. If you have success 👊 you can now load your model.gguf using gpt4all app or ollama.
 
 ### NOTE:
 **Warning: Running this script as root is not recommended.**
