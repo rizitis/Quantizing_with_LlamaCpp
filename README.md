@@ -1,6 +1,6 @@
  ## EDIT 24-11-2024
-**Sackware-current now use python `3.12.7`, but i did not upgrade my system so far**<br>
-**So I have not test yet script for new python version***<br>
+**Sackware-current now use python `3.12.7`, but i did not upgrade my system so far**.<br>
+**So I have not test yet script for new python version**.<br>
 
 Script is based on [GratisStudio](https://github.com/3Simplex/GratisStudio/blob/main/LlamaCpp/Quantizing_with_LlamaCpp.md) HowTo for windows.
 It is tested on Slackware64 current systems without issues. If you found a bug please open an issue.
